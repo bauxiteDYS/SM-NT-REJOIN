@@ -39,7 +39,7 @@ public Action Cmd_Retry(int client, int args)
 
 public Action Timer_ReJoin(Handle timer, int client)
 {
-	timer_count[client] = timer_count[client] +1;
+	timer_count[client]++;
 	
 	if (!IsValidHandle(timer)
 	{
