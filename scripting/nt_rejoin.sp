@@ -10,7 +10,7 @@ public Plugin myinfo = {
 	name = "NT Rejoin",
 	description = "Use !re to rejoin server, then join spec to automatically join the team you were on before",
 	author = "bauxite",
-	version = "0.1.2",
+	version = "0.1.3",
 	url = "",
 };
 
@@ -41,7 +41,7 @@ public Action Timer_ReJoin(Handle timer, int client)
 {
 	timer_count[client] = timer_count[client] +1;
 	
-	if (join_timer[client] == INVALID_HANDLE || join_timer[client] == null)
+	if (!IsValidHandle(timer)
 	{
     		return Plugin_Stop;
 	}
