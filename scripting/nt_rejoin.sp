@@ -1,16 +1,16 @@
 #include <sourcemod>
 #include <sdktools>
 
-Handle join_timer[MaxClients+1];
+Handle join_timer[32+1];
 
-int player_team[MaxClients+1];
-int timer_count[MaxClients+1];
+int player_team[32+1];
+int timer_count[32+1];
 
 public Plugin myinfo = {
 	name = "NT Rejoin",
 	description = "Use !re to rejoin server, then join spec to automatically join the team you were on before",
 	author = "bauxite",
-	version = "0.1.1",
+	version = "0.1.2",
 	url = "",
 };
 
@@ -28,10 +28,10 @@ public Action Cmd_Retry(int client, int args)
 	}
 	
 	player_team[client] = GetClientTeam(client);
-
-	join_timer[client] = CreateTimer(0.75, Timer_ReJoin, client, TIMER_REPEAT);
  
 	ReconnectClient(client);
+
+	join_timer[client] = CreateTimer(0.75, Timer_ReJoin, client, TIMER_REPEAT);
 	
 	return Plugin_Handled;
 }
