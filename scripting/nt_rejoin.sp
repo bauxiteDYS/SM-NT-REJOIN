@@ -10,8 +10,8 @@ public Plugin myinfo = {
 	name = "NT Rejoin",
 	description = "Use !re to rejoin server, then join spec to automatically join the team you were on before",
 	author = "bauxite",
-	version = "0.1.5",
-	url = "",
+	version = "0.1.7",
+	url = "https://github.com/bauxiteDYS/SM-NT-ReJoin",
 };
 
 public void OnPluginStart()
@@ -35,7 +35,6 @@ public Action Cmd_Retry(int client, int args)
 	
 	return Plugin_Handled;
 }
-
 
 public Action Timer_ReJoin(Handle timer, int client)
 {
@@ -67,7 +66,7 @@ public Action Timer_ReJoin(Handle timer, int client)
 	if (timer_count[client] == 30) 
 	{
 		timer_count[client] = 0;
-		
+
 		return Plugin_Stop;
 	}
 	
