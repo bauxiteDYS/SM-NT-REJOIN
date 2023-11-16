@@ -40,7 +40,7 @@ public Action Timer_ReJoin(Handle timer, int client)
 {
 	timer_count[client]++;
 	
-	if (!IsValidHandle(timer)
+	if (!IsValidHandle(timer))
 	{
     		return Plugin_Stop;
 	}
