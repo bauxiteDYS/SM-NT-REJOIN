@@ -42,12 +42,12 @@ public Action Cmd_Retry(int client, int args)
 
 public Action OnTeam(int client, const char[] command, int argc)
 {
-	if(!g_retry[client])
+	if(argc != 1 || !g_retry[client])
 	{
 		return Plugin_Continue;
 	}
 	
-	if(!IsClientInGame(client) || argc != 1)
+	if(!IsClientInGame(client))
 	{
 		return Plugin_Continue;
 	}
