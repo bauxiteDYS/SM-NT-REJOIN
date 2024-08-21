@@ -1,74 +1,76 @@
 #include <sourcemod>
 #include <sdktools>
 
-Handle join_timer[32+1];
-
-int player_team[32+1];
-int timer_count[32+1];
+int g_playerTeam[32+1];
+int g_clientUserId[32+1];
+bool g_retry[32+1];
 
 public Plugin myinfo = {
 	name = "NT Rejoin",
-	description = "Use !re to rejoin server, then join spec to automatically join the team you were on before",
+	description = "Use !retry or !rejoin to rejoin server, then join any team to automatically join the team you were on before",
 	author = "bauxite",
-	version = "0.1.7",
+	version = "0.2.0",
 	url = "https://github.com/bauxiteDYS/SM-NT-ReJoin",
 };
 
 public void OnPluginStart()
 {
-	RegConsoleCmd("sm_re", Cmd_Retry);
+	RegConsoleCmd("sm_retry", Cmd_Retry);
+	RegConsoleCmd("sm_rejoin", Cmd_Retry);
+	AddCommandListener(OnTeam, "jointeam");
 }
 
 public Action Cmd_Retry(int client, int args)
 {
-	if (client == 0)
+	if(client == 0)
 	{
 		ReplyToCommand(client, "This command cannot be used by the server.");
 		return Plugin_Handled;
 	}
 	
-	player_team[client] = GetClientTeam(client);
- 
-	ReconnectClient(client);
-
-	join_timer[client] = CreateTimer(0.75, Timer_ReJoin, client, TIMER_REPEAT);
+	if(!IsClientInGame(client))
+	{
+		return Plugin_Handled;
+	}
 	
-	return Plugin_Handled;
+	g_playerTeam[client] = GetClientTeam(client);
+	g_clientUserId[client] = GetClientUserId(client);
+	g_retry[client] = true;
+	ReconnectClient(client);
+	return Plugin_Continue;
 }
 
-public Action Timer_ReJoin(Handle timer, int client)
+public Action OnTeam(int client, const char[] command, int argc)
 {
-	timer_count[client]++;
-	
-	if (!IsValidHandle(timer))
+	if(!g_retry[client])
 	{
-    		return Plugin_Stop;
+		return Plugin_Continue;
 	}
 	
-	if (IsClientInGame(client))
+	if(!IsClientInGame(client) || argc != 1)
 	{
-		if (GetClientTeam(client) == 2 || GetClientTeam(client) == 3)
-		{	
-			timer_count[client] = 0;
-		
-			return Plugin_Stop;
-		}
-	
-		if (GetClientTeam(client) == 1)
-		{
-			FakeClientCommand(client, "jointeam %d", player_team[client]);
-			timer_count[client] = 0;
-		
-			return Plugin_Stop;
-		}
+		return Plugin_Continue;
 	}
 	
-	if (timer_count[client] == 30) 
+	if(g_clientUserId[client] != GetClientUserId(client))
 	{
-		timer_count[client] = 0;
-
-		return Plugin_Stop;
+		return Plugin_Continue;
 	}
 	
+	int iTeam = GetCmdArgInt(1);
+	if(iTeam > 0 && g_playerTeam[client] > 0)
+	{
+		FakeClientCommandEx(client, "jointeam %d", g_playerTeam[client]);
+		ResetClient(client);
+		return Plugin_Handled;
+	}
+	
+	ResetClient(client);
 	return Plugin_Continue;
+}
+
+void ResetClient(int client)
+{
+	g_retry[client] = false;
+	g_playerTeam[client] = 0;
 }
